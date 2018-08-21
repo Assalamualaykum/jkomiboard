@@ -145,7 +145,7 @@
           (println "Ei loopattu, ei syotavia kivia loopattu")
           (println "syotävätKivet" syotavatKivet)
           (println syotavatKivet "a" tamanhetkinenPaikka tamanhetkinenKivi)
-          ;VÄÄRIN PÄIN, tarista virheiden varalta
+          ;VÄÄRIN PÄIN, tarista virheiden varalta tassa velä git testirivi
           ;onko listassa tarkasteltavalla kivellä kutsuttu rekursioHirviötä?
           (if (not (some #(= tamanhetkinenPaikka %) syotavatKivet))
             ;onko tarkasteltava paikka tyhjä?
