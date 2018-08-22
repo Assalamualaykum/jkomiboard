@@ -124,10 +124,14 @@
 
 ;Rekursiohirviö joka selvittää kaikki ne kivet jotka ovat samassa ryppäässä kutsutun kiven kanssa,
 ;palauttaa listan missä ei ole arvoa nil mikäli rypäs on syötävissä eli ympäröity
+;Vika: toimii vain mikäli tarkistetutLista on tyhjä vektori [], mikäli annetaan jotain muuta palauttaa virheen
+; clojure.lang.ArityException: Wrong number of args (1) passed to: komiboard/rekursiohirvio
+;  Palauttaa saman virheen myös rekursiivisilla kutsuilla
 (defn rekursiohirvio [paikka kentta tarkistetutLista]
   (def paikka1 paikka)
+  (println paikka kentta tarkistetutLista [tarkistetutLista])
   ;tarkistetaan aluksi ovatko aiemmat hirviöt löytäneet tyhjää
-  (if (not (some #(= nil) tarkistetutLista))
+  (if (not (some #(= nil) []))
     (do
       ;tarvittavat alustukset, kirjoitettu vasta tyhjäntarkistuksen jälkeen optimoinnin vuoksi
       (println "Ei loopattu, ei syotavia kivia11")
@@ -185,7 +189,7 @@
         (println "Ei loopattu1, ei syotavia kivia")
         (def tamanhetkinenPaikka (get vierekkaisetSyotavatPaikat i))
         (println "Ei loopattu2, ei syotavia kivia")
-        (println (rekursiohirvio tamanhetkinenPaikka kentta []))
+        (println (rekursiohirvio tamanhetkinenPaikka kentta [1 1]))
         (println "Ei loopattu3, ei syotavia kivia")
         (recur (+ i 1));recur
         );when
@@ -206,6 +210,19 @@
 (def valinta [1 1])
 (println (voikoAsettaaJaSyoda valinta board2))
 ;(println (eikoVoiSyoda valinta board2))
+
+(defn variadic? [s]
+  (and (some #{'&} s)
+       (not (every? #{'&} s))))
+
+(defn arities [v]
+  (->> v
+       meta
+       :arglists
+       (map #(if (variadic? %) :variadic %))
+       (map #(if (sequential? %) (count %) %))))
+
+(println (map arities [#'rekursiohirvio]))
 
 (def kivi [1 1])
 (def tarkistettavat [[1 1] [2 2]])
