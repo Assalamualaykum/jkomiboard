@@ -48,7 +48,7 @@
   (def omaKivi (get-in kentta paikka))
   (loop [i 0 vertailuarvo true]
     (when (< i 4)
-      (println i)
+      ;(println i)
       ;lopeta mikäli vieressäoleva kivi on oma taikka tyhjä, ja palauta true
       (if (or (= (get ymparoivatKivet i) "E")
               (= (get ymparoivatKivet i) omaKivi))
@@ -62,7 +62,7 @@
 ;Funktio palauttaa kutsuttavaa paikkaa ympäröivät kivet jarjestyksessa vasen, oikea, yla, ala
 (defn ymparoidytKivet [paikka kentta]
   ;palauttaa taman muuttujan, def jotta muuttuja muuttuisi kutsujen välillä
-  (println paikka)
+  ;(println paikka)
   (def paikat [(get-in kentta [(get paikka 0) (- (get paikka 1) 1)])
                (get-in kentta [(get paikka 0) (+ (get paikka 1) 1)])
                (get-in kentta [(- (get paikka 0) 1) (get paikka 1)])
@@ -91,23 +91,23 @@
     ;sama kuin vuoron omistavan kivi joka olisi asetettu vaikka paikka olisikin tyhja
     (def asetettavaKivi (get-in annettuboard alkPerKivi))
     (when (< i 4)
-      (println i)
+      ;(println i)
 
       ;tämä ensimmäinen if palauttaa mahdollisen vihollisen kiven sillon kuin se on tarkasteltavan kiven vieressä
       (def lisattavaKohta (if (not (or (= tarkasteltavaKivi "W") (= tarkasteltavaKivi "E") (= tarkasteltavaKivi asetettavaKivi)))
                             (get annetutSivuPaikat i)
-                            (println "else")
+                            ;(println "else")
                             ))
-      (println lisattavaKohta "asda" syontiTarkistettavat)
-      (println (not (or (= tarkasteltavaKivi "W") (= tarkasteltavaKivi "E") (= tarkasteltavaKivi asetettavaKivi))))
+      ;(println lisattavaKohta "asda" syontiTarkistettavat)
+      ;(println (not (or (= tarkasteltavaKivi "W") (= tarkasteltavaKivi "E") (= tarkasteltavaKivi asetettavaKivi))))
 
-      (println "loopattava " tarkasteltavaKivi)
-      (println "permakivi " asetettavaKivi)
+      ;(println "loopattava " tarkasteltavaKivi)
+      ;(println "permakivi " asetettavaKivi)
 
-      (println "testit")
-      (println (= tarkasteltavaKivi "W"))
-      (println (= tarkasteltavaKivi "E"))
-      (println (= tarkasteltavaKivi asetettavaKivi))
+      ;(println "testit")
+      ;(println (= tarkasteltavaKivi "W"))
+      ;(println (= tarkasteltavaKivi "E"))
+      ;(println (= tarkasteltavaKivi asetettavaKivi))
 
       ) ;When
     ;tässä korjaan lisättävän arvon nil arvon tyhjäksi
@@ -124,14 +124,11 @@
 
 ;Rekursiohirviö joka selvittää kaikki ne kivet jotka ovat samassa ryppäässä kutsutun kiven kanssa,
 ;palauttaa listan missä ei ole arvoa nil mikäli rypäs on syötävissä eli ympäröity
-;Vika: toimii vain mikäli tarkistetutLista on tyhjä vektori [], mikäli annetaan jotain muuta palauttaa virheen
-; clojure.lang.ArityException: Wrong number of args (1) passed to: komiboard/rekursiohirvio
-;  Palauttaa saman virheen myös rekursiivisilla kutsuilla
 (defn rekursiohirvio [paikka kentta tarkistetutLista]
   (def paikka1 paikka)
-  (println paikka kentta tarkistetutLista [tarkistetutLista])
+  (println "tämän kutsun paikat" paikka kentta tarkistetutLista)
   ;tarkistetaan aluksi ovatko aiemmat hirviöt löytäneet tyhjää
-  (if (not (some #(= nil) []))
+  (if (not (some #(= nil %) [tarkistetutLista]))
     (do
       ;tarvittavat alustukset, kirjoitettu vasta tyhjäntarkistuksen jälkeen optimoinnin vuoksi
       (println "Ei loopattu, ei syotavia kivia11")
@@ -181,15 +178,14 @@
 ;Tarkistetaan voiko seuraavaksi asetettava kivi syödä vieresssäolevia kiviä, ja lisätään se listaan
 (defn voikoAsettaaJaSyoda [paikka kentta]
   (def vierekkaisetSyotavatPaikat (otaSyotavat paikka kentta))
-  (println vierekkaisetSyotavatPaikat "TAMA PITAISI SYODA")
+  (println vierekkaisetSyotavatPaikat "NAMA PITAISI SYODA")
   ;tarkistetaan aluksi onko paikka sallittu ja vapaana
   (if (= (eikoVoiSyoda paikka kentta) true)
     (loop [i 0]
       (when (< i (count vierekkaisetSyotavatPaikat))
-        (println "Ei loopattu1, ei syotavia kivia")
         (def tamanhetkinenPaikka (get vierekkaisetSyotavatPaikat i))
-        (println "Ei loopattu2, ei syotavia kivia")
-        (println (rekursiohirvio tamanhetkinenPaikka kentta [1 1]))
+        (println "Tamanhetkinen syova kivi" (get-in kentta tamanhetkinenPaikka))
+        (println (rekursiohirvio tamanhetkinenPaikka kentta []))
         (println "Ei loopattu3, ei syotavia kivia")
         (recur (+ i 1));recur
         );when
@@ -210,19 +206,6 @@
 (def valinta [1 1])
 (println (voikoAsettaaJaSyoda valinta board2))
 ;(println (eikoVoiSyoda valinta board2))
-
-(defn variadic? [s]
-  (and (some #{'&} s)
-       (not (every? #{'&} s))))
-
-(defn arities [v]
-  (->> v
-       meta
-       :arglists
-       (map #(if (variadic? %) :variadic %))
-       (map #(if (sequential? %) (count %) %))))
-
-(println (map arities [#'rekursiohirvio]))
 
 (def kivi [1 1])
 (def tarkistettavat [[1 1] [2 2]])
