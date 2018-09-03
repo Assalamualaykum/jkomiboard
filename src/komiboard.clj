@@ -135,32 +135,35 @@
       (def vierekkaisetPaikat (ymparoidytPaikat paikka))
       (println "vierekkaisetPaikat kutsu" vierekkaisetPaikat)
       ;lisätään uusin rekursiohirviökutsuttu kivi listaan
-      (def tarkistetutLista1 (conj tarkistetutLista paikka))
-      (loop [i 0, syotavatKivet tarkistetutLista] ;alustetaan tyhjäksi listaksi?----------
+      (if (not (some #(= paikka %) tarkistetutLista))
+        (def tarkistetutLista1 (conj tarkistetutLista paikka));--------------------------------------
+        )
+      (println "toimii" tarkistetutLista1)
+      (loop [i 0, syotavatKivet tarkistetutLista]
         (def tamanhetkinenKivi (get vierekkaisetKivet i))
         (def tamanhetkinenPaikka (get vierekkaisetPaikat i))
         (when (< i 4)
           ;(println "Ei loopattu, ei syotavia kivia loopattu")
           ;(println "syotävätKivet" syotavatKivet)
-          (println syotavatKivet tamanhetkinenPaikka tamanhetkinenKivi)
+          (println syotavatKivet tamanhetkinenPaikka tamanhetkinenKivi i)
           ;VÄÄRIN PÄIN, tarista virheiden varalta tassa velä git testirivi
           ;onko listassa tarkasteltavalla kivellä kutsuttu rekursioHirviötä?
-          (if (not (some #(= tamanhetkinenPaikka %) syotavatKivet))
+          (if (not (some #(= tamanhetkinenPaikka %) syotavatKivet)) ;--------------------------------------
             ;onko tarkasteltava paikka tyhjä?
             (if (= tamanhetkinenKivi "E")
               ;true palauta lista jossa on nil, valitettavasti tässä ratkaisussa hukataan listan aiemmat noodit
-              (recur (+ i 1) (conj syotavatKivet nil)) ;vika tässä-------
+              (recur (+ i 1) (conj syotavatKivet nil))
               ;else: onko vieressäoleva kivi oma eli parametriksi annetun, kutsutun kiven väri?
-              (if (= tamanhetkinenKivi (get-in kentta paikka)) ;-----Tähän kiven väri, ei paikka
+              (if (= tamanhetkinenKivi (get-in kentta paikka))
                 (recur (+ i 1) (conj syotavatKivet (rekursiohirvio tamanhetkinenPaikka kentta (conj syotavatKivet paikka))))
                 ;else jatka seuraavaan loopin kiveen, älä tee mitään
                 (recur (+ i 1) (conj syotavatKivet ""))
                 ); if-4 onkoRyppaassa/oma
               ); if-3 onkotyhja
             ;else jatka seuraavaan loopin kiveen, sillä viimeisin oli jo tarkistettu
-            (if (= i 4)
+            (if (= i 2)
               ;kun looppi loppuu palautetaan tähän asti muodostettu tarkistettujen noodien lista
-              (syotavatKivet)
+              (println "asdasdadsadda" syotavatKivet)
               )
             ); if-2 onkotarkistettu^
 
@@ -193,9 +196,9 @@
   )
 
 ;ennen asetusta tulee tyhjään paikkaan asettaa vuoronomistajan kivi, ja poistaa se asetustestin jälkeen
-(def board2 [["W" "W" "W" "W" "W" "W" "W"]
-             ["W" "R" "G" "G" "E" "E" "W"]
-             ["W" "R" "G" "F" "E" "E" "W"]
+(def board2 [["W" "W" "Y" "U" "W" "W" "W"]
+             ["W" "R" "G" "G" "R" "E" "W"]
+             ["W" "R" "Y" "U" "E" "E" "W"]
              ["W" "E" "E" "E" "E" "E" "W"]
              ["W" "E" "E" "E" "E" "E" "W"]
              ["W" "E" "E" "E" "E" "E" "W"]
