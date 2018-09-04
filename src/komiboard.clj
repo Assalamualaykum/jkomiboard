@@ -142,7 +142,7 @@
       (loop [i 0, syotavatKivet tarkistetutLista]
         (def tamanhetkinenKivi (get vierekkaisetKivet i))
         (def tamanhetkinenPaikka (get vierekkaisetPaikat i))
-        (when (< i 4)
+        (when (< i 5)
           ;(println "Ei loopattu, ei syotavia kivia loopattu")
           ;(println "syotävätKivet" syotavatKivet)
           (println syotavatKivet tamanhetkinenPaikka tamanhetkinenKivi i)
@@ -155,13 +155,13 @@
               (recur (+ i 1) (conj syotavatKivet nil))
               ;else: onko vieressäoleva kivi oma eli parametriksi annetun, kutsutun kiven väri?
               (if (= tamanhetkinenKivi (get-in kentta paikka))
-                (recur (+ i 1) (conj syotavatKivet (rekursiohirvio tamanhetkinenPaikka kentta (conj syotavatKivet paikka))))
+                (recur (+ i 1) (conj syotavatKivet (rekursiohirvio tamanhetkinenPaikka kentta (conj syotavatKivet paikka)))) ;Lisätään nil listaan?---
                 ;else jatka seuraavaan loopin kiveen, älä tee mitään
                 (recur (+ i 1) (conj syotavatKivet ""))
                 ); if-4 onkoRyppaassa/oma
               ); if-3 onkotyhja
-            ;else jatka seuraavaan loopin kiveen, sillä viimeisin oli jo tarkistettu
-            (if (= i 2)
+            ;else jatka seuraavaan loopin kiveen, sillä viimeisin oli jo tarkistettu ------Ei konsistentti palautus.-----
+            (if (= i 4)
               ;kun looppi loppuu palautetaan tähän asti muodostettu tarkistettujen noodien lista
               (println "asdasdadsadda" syotavatKivet)
               )
