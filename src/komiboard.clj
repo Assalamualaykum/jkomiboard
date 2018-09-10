@@ -139,7 +139,7 @@
         (def tarkistetutLista1 (conj tarkistetutLista paikka));--------------------------------------
         )
       (println "toimii" tarkistetutLista1)
-      (loop [i 0, syotavatKivet tarkistetutLista]
+      (loop [i 0, syotavatKivet tarkistetutLista1]
         (def tamanhetkinenKivi (get vierekkaisetKivet i))
         (def tamanhetkinenPaikka (get vierekkaisetPaikat i))
         (when (< i 5)
@@ -148,7 +148,7 @@
           (println syotavatKivet tamanhetkinenPaikka tamanhetkinenKivi i)
           ;VÄÄRIN PÄIN, tarista virheiden varalta tassa velä git testirivi
           ;onko listassa tarkasteltavalla kivellä kutsuttu rekursioHirviötä?
-          (if (not (some #(= tamanhetkinenPaikka %) syotavatKivet)) ;--------------------------------------
+          (if (and (not (some #(= tamanhetkinenPaikka %) syotavatKivet)) (< i 4)) ;--------------------------------------
             ;onko tarkasteltava paikka tyhjä?
             (if (= tamanhetkinenKivi "E")
               ;true palauta lista jossa on nil, valitettavasti tässä ratkaisussa hukataan listan aiemmat noodit
