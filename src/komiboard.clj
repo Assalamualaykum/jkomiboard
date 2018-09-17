@@ -143,10 +143,7 @@
         (let [tamanhetkinenKivi (get vierekkaisetKivet i)]
         (let [tamanhetkinenPaikka (get vierekkaisetPaikat i)]
         (when (< i 5)
-          ;(println "Ei loopattu, ei syotavia kivia loopattu")
-          ;(println "syotävätKivet" syotavatKivet)
           (println syotavatKivet tamanhetkinenPaikka tamanhetkinenKivi i)
-          ;VÄÄRIN PÄIN, tarista virheiden varalta tassa velä git testirivi
           ;onko listassa tarkasteltavalla kivellä kutsuttu rekursioHirviötä?
           (if (and (not (some #(= tamanhetkinenPaikka %) syotavatKivet)) (< i 4)) ;--------------------------------------
             ;onko tarkasteltava paikka tyhjä?
@@ -155,7 +152,7 @@
               (recur (+ i 1) (conj syotavatKivet nil))
               ;else: onko vieressäoleva kivi oma eli parametriksi annetun, kutsutun kiven väri?
               (if (= tamanhetkinenKivi (get-in kentta paikka))
-                (recur (+ i 1) (let [syotavatKivet (rekursiohirvio tamanhetkinenPaikka kentta syotavatKivet)])) ;Lisätään nil listaan? Ja tuplakonjuktio---
+                (recur (+ i 1) (rekursiohirvio tamanhetkinenPaikka kentta syotavatKivet))
                 ;else jatka seuraavaan loopin kiveen, älä tee mitään
                 (recur (+ i 1) (conj syotavatKivet ""))
                 ); if-4 onkoRyppaassa/oma
@@ -167,7 +164,6 @@
               (recur (+ i 1) (conj syotavatKivet ""))
               )
             ); if-2 onkotarkistettu^
-
           );when
           ));Let3;Let4
         );loop
@@ -187,8 +183,7 @@
       (when (< i (count vierekkaisetSyotavatPaikat))
         (def tamanhetkinenPaikka (get vierekkaisetSyotavatPaikat i))
         (println "Tamanhetkinen syova kivi" (get-in kentta tamanhetkinenPaikka))
-        (println (rekursiohirvio tamanhetkinenPaikka kentta []))
-        (println "Ei loopattu3, ei syotavia kivia")
+        (println "Rekursiohirvio palautti taman: " (rekursiohirvio tamanhetkinenPaikka kentta []))
         (recur (+ i 1));recur
         );when
       );loop
