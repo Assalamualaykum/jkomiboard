@@ -6,22 +6,27 @@
 
 
 (defn tarkistus []
-
   (def board2 [["W" "W" "W" "W" "W" "W" "W"]
-               ["W" "E" "E" "E" "E" "E" "W"]
-               ["W" "E" "E" "E" "E" "E" "W"]
+               ["W" "R" "G" "G" "R" "E" "W"]
+               ["W" "R" "R" "G" "R" "E" "W"]
                ["W" "E" "E" "E" "E" "E" "W"]
                ["W" "E" "E" "E" "E" "E" "W"]
                ["W" "E" "E" "E" "E" "E" "W"]
                ["W" "W" "W" "W" "W" "W" "W"]])
   (def valinta [1 1])
+  (println "Which player starts? R for red, G for green")
+  (def kiviVuoro (read-line))
+  (when (not (and (= kiviVuoro "G") (= kiviVuoro "R")))
+    (println "This letter is neither R or G, please enter the value again,
+      note the capitalization")
+    (def kiviVuoro (read-line))
+    )
+  (println kiviVuoro "Aloittaa")
 
-  ;Vihreä aloittaa aina
-  (def kiviVuoro "R")
-  (if (= kiviVuoro "G") (def kiviVuoro "R") (def kiviVuoro "G"))
+  ;(if (or (= kiviVuoro "G") (= kiviVuoro "R"))
+    ;)
+
   (println kiviVuoro)
-
-  (if (= (get-in board2 valinta) "E")
     ;takista seuraavaksi voiko kivi syödä mitään, jos ei,
     ;palauta vaarä liike, kirjoita funktio voikoSyödä
     (if (= (get-in board2 valinta) "E")
@@ -37,7 +42,6 @@
       (println "else tulee tähän")
       )
     (println "Vaara liike, paikka varattu, valitse E eli tyhja paikka")
-    )
   )
 
 ;tarkistetaan onko paikassa oleva kivi syöty,
@@ -91,23 +95,21 @@
     ;sama kuin vuoron omistavan kivi joka olisi asetettu vaikka paikka olisikin tyhja
     (def asetettavaKivi (get-in annettuboard alkPerKivi))
     (when (< i 4)
-      ;(println i)
-
       ;tämä ensimmäinen if palauttaa mahdollisen vihollisen kiven sillon kuin se on tarkasteltavan kiven vieressä
       (def lisattavaKohta (if (not (or (= tarkasteltavaKivi "W") (= tarkasteltavaKivi "E") (= tarkasteltavaKivi asetettavaKivi)))
                             (get annetutSivuPaikat i)
                             ;(println "else")
                             ))
-      ;(println lisattavaKohta "asda" syontiTarkistettavat)
-      ;(println (not (or (= tarkasteltavaKivi "W") (= tarkasteltavaKivi "E") (= tarkasteltavaKivi asetettavaKivi))))
+      (println lisattavaKohta "asda" syontiTarkistettavat)
+      (println (not (or (= tarkasteltavaKivi "W") (= tarkasteltavaKivi "E") (= tarkasteltavaKivi asetettavaKivi))))
 
-      ;(println "loopattava " tarkasteltavaKivi)
-      ;(println "permakivi " asetettavaKivi)
+      (println "loopattava " tarkasteltavaKivi)
+      (println "permakivi " asetettavaKivi)
 
-      ;(println "testit")
-      ;(println (= tarkasteltavaKivi "W"))
-      ;(println (= tarkasteltavaKivi "E"))
-      ;(println (= tarkasteltavaKivi asetettavaKivi))
+      (println "testit")
+      (println (= tarkasteltavaKivi "W"))
+      (println (= tarkasteltavaKivi "E"))
+      (println (= tarkasteltavaKivi asetettavaKivi))
 
       ) ;When
     ;tässä korjaan lisättävän arvon nil arvon tyhjäksi
@@ -136,7 +138,7 @@
       (println "vierekkaisetPaikat kutsu" vierekkaisetPaikat)
       ;lisätään uusin rekursiohirviökutsuttu kivi listaan
       (if (not (some #(= paikka %) tarkistetutLista))
-        (def tarkistetutLista1 (conj tarkistetutLista paikka));--------------------------------------
+        (def tarkistetutLista1 (conj tarkistetutLista paikka))
         )
       (println "toimii" tarkistetutLista1)
       (loop [i 0, syotavatKivet tarkistetutLista1]
@@ -145,7 +147,7 @@
         (when (< i 5)
           (println syotavatKivet tamanhetkinenPaikka tamanhetkinenKivi i)
           ;onko listassa tarkasteltavalla kivellä kutsuttu rekursioHirviötä?
-          (if (and (not (some #(= tamanhetkinenPaikka %) syotavatKivet)) (< i 4)) ;--------------------------------------
+          (if (and (not (some #(= tamanhetkinenPaikka %) syotavatKivet)) (< i 4))
             ;onko tarkasteltava paikka tyhjä?
             (if (= tamanhetkinenKivi "E")
               ;true palauta lista jossa on nil, valitettavasti tässä ratkaisussa hukataan listan aiemmat noodit
@@ -195,13 +197,14 @@
 ;ennen asetusta tulee tyhjään paikkaan asettaa vuoronomistajan kivi, ja poistaa se asetustestin jälkeen
 (def board2 [["W" "W" "W" "W" "W" "W" "W"]
              ["W" "R" "G" "G" "R" "E" "W"]
-             ["W" "R" "R" "G" "E" "E" "W"]
+             ["W" "R" "R" "G" "R" "E" "W"]
              ["W" "E" "E" "E" "E" "E" "W"]
              ["W" "E" "E" "E" "E" "E" "W"]
              ["W" "E" "E" "E" "E" "E" "W"]
              ["W" "W" "W" "W" "W" "W" "W"]])
-(def valinta [1 1])
-(println (voikoAsettaaJaSyoda valinta board2))
+(def valinta [3 3])
+;(println (voikoAsettaaJaSyoda valinta board2))
+(println (tarkistus))
 ;(println (eikoVoiSyoda valinta board2))
 
 (def kivi [1 1])
