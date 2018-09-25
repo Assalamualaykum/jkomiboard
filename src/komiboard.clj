@@ -2,10 +2,14 @@
 (ns komiboard
   (:gen-class))
 
-(declare onkoYmparoity ymparoidytKivet voikoSyoda)
+(declare onkoYmparoity ymparoidytKivet voikoSyoda aloitaPeli paikanValinta )
 
+(defn initBoard []
+  (aloitaPeli)
+  (paikanValinta)
+  )
 
-(defn tarkistus []
+(defn aloitaPeli []
   (def board2 [["W" "W" "W" "W" "W" "W" "W"]
                ["W" "R" "G" "G" "R" "E" "W"]
                ["W" "R" "R" "G" "R" "E" "W"]
@@ -15,33 +19,48 @@
                ["W" "W" "W" "W" "W" "W" "W"]])
   (def valinta [1 1])
   (println "Which player starts? R for red, G for green")
-  (def kiviVuoro (read-line))
-  (when (not (and (= kiviVuoro "G") (= kiviVuoro "R")))
-    (println "This letter is neither R or G, please enter the value again,
-      note the capitalization")
-    (def kiviVuoro (read-line))
-    )
-  (println kiviVuoro "Aloittaa")
 
-  ;(if (or (= kiviVuoro "G") (= kiviVuoro "R"))
-    ;)
-
-  (println kiviVuoro)
-    ;takista seuraavaksi voiko kivi syödä mitään, jos ei,
-    ;palauta vaarä liike, kirjoita funktio voikoSyödä
-    (if (= (get-in board2 valinta) "E")
-      ;Vasen
-      (println (get-in board2 [(get valinta 0) (- (get valinta 1) 1)])
-               ;Oikea
-               (get-in board2 [(get valinta 0) (+ (get valinta 1) 1)])
-               ;Ylempi
-               (get-in board2 [(- (get valinta 1) 1) (get valinta 1)])
-               ;Alempi
-               (get-in board2 [(+ (get valinta 1) 1) (get valinta 1)])
-               )
-      (println "else tulee tähän")
+  (def vuoroKirjain (read-line))
+  (def kiviVuoro
+    (loop [kiviVuoro vuoroKirjain]
+      (if (not (or (= kiviVuoro "G") (= kiviVuoro "R")))
+        (do
+          (println "This letter (" kiviVuoro ") is neither R or G, please enter the value again, note the capitalization")
+          (def kiviVuoro1 (read-line))
+          (recur kiviVuoro1)
+          )
+        kiviVuoro
+        )
       )
-    (println "Vaara liike, paikka varattu, valitse E eli tyhja paikka")
+    )
+  )
+
+(defn paikanValinta []
+  (println kiviVuoro "Aloittaa, valitse ensimmäinen paikka johon aiot sijoittaa kiven,
+      anna paikkvalintasi muodossa Y X, valitse paikoista [1 1] - [5 5]
+      Anna ensin rivi, sitten sarake.")
+  (println paikkavalinta)
+
+  (def paikkavalinta [(read-line) (read-line)])
+  (def paikkavalinta
+    (loop [paikkavalinta paikkavalinta]
+      (if (not (or (= paikkavalinta "1") (= paikkavalinta "2") (= paikkavalinta "3") (= paikkavalinta "4") (= paikkavalinta "5")))
+        (do
+          (println "This number (" paikkavalinta ") is neither 1, 2, 3, 4 or 5, please enter the value again, note the capitalization")
+          (def palautettupaikka (read-line))
+          (recur palautettupaikka)
+          )
+        paikkavalinta
+        )
+      )
+    )
+
+  ;takista seuraavaksi voiko kivi syödä mitään, jos ei,
+  ;palauta vaarä liike
+  ;eikoVoiSyoda [paikka kentta]
+
+  ;kirjoita sitten syönti, tarkista onko kivenasetus järjestetty ennen syöntikutsua niin että kivi myös poistetaan
+  ;Kirjoita syötyjen kivien poistamiskutsu.
   )
 
 ;tarkistetaan onko paikassa oleva kivi syöty,
@@ -186,7 +205,7 @@
         (def tamanhetkinenPaikka (get vierekkaisetSyotavatPaikat i))
         (println "Tamanhetkinen syova kivi" (get-in kentta tamanhetkinenPaikka))
         (println "Rekursiohirvio palautti taman: " (rekursiohirvio tamanhetkinenPaikka kentta []))
-        (recur (+ i 1));recur
+        (recur (+ i 1)) ;recur
         );when
       );loop
     (println "Ei loopattu, tahan ei voida asettaa kivea, syontiuhka tai kivi tiella")
@@ -204,12 +223,11 @@
              ["W" "W" "W" "W" "W" "W" "W"]])
 (def valinta [3 3])
 ;(println (voikoAsettaaJaSyoda valinta board2))
-(println (tarkistus))
+(println (initBoard))
 ;(println (eikoVoiSyoda valinta board2))
 
 (def kivi [1 1])
 (def tarkistettavat [[1 1] [2 2]])
-(def tarkistetut [])
 (def annetut [[1 0] [1 2] [0 1] [2 1]])
 (if true
   (def annetut "taysin uusi arvonalustus")
