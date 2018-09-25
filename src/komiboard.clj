@@ -39,9 +39,9 @@
   (println kiviVuoro "Aloittaa, valitse ensimmäinen paikka johon aiot sijoittaa kiven,
       anna paikkvalintasi muodossa Y X, valitse paikoista [1 1] - [5 5]
       Anna ensin rivi, sitten sarake.")
-  (println paikkavalinta)
 
   (def paikkavalinta [(read-line) (read-line)])
+  (println paikkavalinta)
   (def paikkavalinta
     (loop [paikkavalinta paikkavalinta]
       (if (not (or (= paikkavalinta "1") (= paikkavalinta "2") (= paikkavalinta "3") (= paikkavalinta "4") (= paikkavalinta "5")))
