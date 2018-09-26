@@ -2,15 +2,26 @@
 (ns komiboard
   (:gen-class))
 
-(declare onkoYmparoity ymparoidytKivet voikoSyoda aloitaPeli paikanValinta )
-
-(defn initBoard []
-  (aloitaPeli)
-  (paikanValinta)
-  )
+(declare onkoYmparoity ymparoidytKivet voikoSyoda aloitaPeli paikanValinta vuoronValinta )
 
 (defn aloitaPeli []
-  (def board2 [["W" "W" "W" "W" "W" "W" "W"]
+  (defn board (initboard))
+  (vuoronValinta board) ;palauttaa valitun vuoron, R tai G
+  (paikanValinta board) ;palauttaa valitun paikan muodossa [Y X]
+  )
+
+(defn initBoard []
+  (def tyhjaBoard [["W" "W" "W" "W" "W" "W" "W"]
+               ["W" "R" "G" "G" "R" "E" "W"]
+               ["W" "R" "R" "G" "R" "E" "W"]
+               ["W" "E" "E" "E" "E" "E" "W"]
+               ["W" "E" "E" "E" "E" "E" "W"]
+               ["W" "E" "E" "E" "E" "E" "W"]
+               ["W" "W" "W" "W" "W" "W" "W"]])
+  )
+
+(defn vuoronValinta [board1]
+  (def board1 [["W" "W" "W" "W" "W" "W" "W"]
                ["W" "R" "G" "G" "R" "E" "W"]
                ["W" "R" "R" "G" "R" "E" "W"]
                ["W" "E" "E" "E" "E" "E" "W"]
@@ -35,7 +46,7 @@
     )
   )
 
-(defn paikanValinta []
+(defn paikanValinta [board2]
   (println kiviVuoro "Aloittaa, valitse ensimmäinen paikka johon aiot sijoittaa kiven,
       anna paikkvalintasi muodossa Y X, valitse paikoista [1 1] - [5 5]
       Anna ensin rivi, sitten sarake.")
@@ -60,7 +71,7 @@
   ;eikoVoiSyoda [paikka kentta]
 
   ;kirjoita sitten syönti, tarkista onko kivenasetus järjestetty ennen syöntikutsua niin että kivi myös poistetaan
-  ;Kirjoita syötyjen kivien poistamiskutsu.
+  ;Kirjoita syötyjen kivien poistamiskutsu. Kirjoita laitaListaan, poistaListasta (boardista)
   )
 
 ;tarkistetaan onko paikassa oleva kivi syöty,
@@ -223,7 +234,7 @@
              ["W" "W" "W" "W" "W" "W" "W"]])
 (def valinta [3 3])
 ;(println (voikoAsettaaJaSyoda valinta board2))
-(println (initBoard))
+(println (aloitaPeli))
 ;(println (eikoVoiSyoda valinta board2))
 
 (def kivi [1 1])
