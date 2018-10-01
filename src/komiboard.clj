@@ -2,12 +2,23 @@
 (ns komiboard
   (:gen-class))
 
-(declare onkoYmparoity ymparoidytKivet voikoSyoda aloitaPeli paikanValinta vuoronValinta )
+(declare onkoYmparoity ymparoidytKivet voikoSyoda initBoard aloitaPeli paikanValinta vuoronValinta)
 
 (defn aloitaPeli []
-  (defn board (initboard))
+  ;(defn board (initboard))
+  ;lisäälistaan
+  (def board [["W" "W" "W" "W" "W" "W" "W"]
+                   ["W" "R" "G" "G" "R" "E" "W"]
+                   ["W" "R" "R" "G" "R" "E" "W"]
+                   ["W" "E" "E" "E" "E" "E" "W"]
+                   ["W" "E" "E" "E" "E" "E" "W"]
+                   ["W" "E" "E" "E" "E" "E" "W"]
+                   ["W" "W" "W" "W" "W" "W" "W"]])
   (vuoronValinta board) ;palauttaa valitun vuoron, R tai G
   (paikanValinta board) ;palauttaa valitun paikan muodossa [Y X]
+  ;voikoAsettaaJaSyoda
+  ;poistalistasta
+  ;recur vaihdavuoro?
   )
 
 (defn initBoard []
@@ -18,6 +29,7 @@
                ["W" "E" "E" "E" "E" "E" "W"]
                ["W" "E" "E" "E" "E" "E" "W"]
                ["W" "W" "W" "W" "W" "W" "W"]])
+  tyhjaBoard
   )
 
 (defn vuoronValinta [board1]
@@ -51,15 +63,19 @@
       anna paikkvalintasi muodossa Y X, valitse paikoista [1 1] - [5 5]
       Anna ensin rivi, sitten sarake.")
 
-  (def paikkavalinta [(read-line) (read-line)])
-  (println paikkavalinta)
+  ;(def paikkavalinta [(read-line) (read-line)])
+  (def valittupaikka1 (read-line))
+  (def valittupaikka2 (read-line))
   (def paikkavalinta
-    (loop [paikkavalinta paikkavalinta]
-      (if (not (or (= paikkavalinta "1") (= paikkavalinta "2") (= paikkavalinta "3") (= paikkavalinta "4") (= paikkavalinta "5")))
+    (loop [paikkavalinta1 valittupaikka1 paikkavalinta2 valittupaikka2]
+      (println "paikkavallinnan arvot?" paikkavalinta1 paikkavalinta2)
+      (if (not (and (or (= paikkavalinta1 "1") (= paikkavalinta1 "2") (= paikkavalinta1 "3") (= paikkavalinta1 "4") (= paikkavalinta1 "5"))
+               (or (= valittupaikka2 "1") (= valittupaikka2 "2") (= valittupaikka2 "3") (= valittupaikka2 "4") (= valittupaikka2 "5"))))
         (do
-          (println "This number (" paikkavalinta ") is neither 1, 2, 3, 4 or 5, please enter the value again, note the capitalization")
-          (def palautettupaikka (read-line))
-          (recur palautettupaikka)
+          (println "These letters (" paikkavalinta1 " and " paikkavalinta2 ") aren't both 1, 2, 3, 4 or 5, please enter the letters again")
+          (def palautettupaikka1 (read-line))
+          (def palautettupaikka2 (read-line))
+          (recur palautettupaikka1 palautettupaikka2)
           )
         paikkavalinta
         )
