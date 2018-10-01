@@ -2,18 +2,12 @@
 (ns komiboard
   (:gen-class))
 
-(declare onkoYmparoity ymparoidytKivet voikoSyoda initBoard aloitaPeli paikanValinta vuoronValinta)
+(declare onkoYmparoity ymparoidytKivet voikoSyoda initBoard aloitaPeli paikanValinta vuoronValinta lisaaListaan)
 
 (defn aloitaPeli []
-  ;(defn board (initboard))
+  (def board (initBoard))
   ;lisäälistaan
-  (def board [["W" "W" "W" "W" "W" "W" "W"]
-                   ["W" "R" "G" "G" "R" "E" "W"]
-                   ["W" "R" "R" "G" "R" "E" "W"]
-                   ["W" "E" "E" "E" "E" "E" "W"]
-                   ["W" "E" "E" "E" "E" "E" "W"]
-                   ["W" "E" "E" "E" "E" "E" "W"]
-                   ["W" "W" "W" "W" "W" "W" "W"]])
+  (println board)
   (vuoronValinta board) ;palauttaa valitun vuoron, R tai G
   (paikanValinta board) ;palauttaa valitun paikan muodossa [Y X]
   ;voikoAsettaaJaSyoda
@@ -65,12 +59,12 @@
 
   ;(def paikkavalinta [(read-line) (read-line)])
   (def valittupaikka1 (read-line))
-  (def valittupaikka2 (read-line))
+  (def paikkavalinta2 (read-line))
   (def paikkavalinta
-    (loop [paikkavalinta1 valittupaikka1 paikkavalinta2 valittupaikka2]
+    (loop [paikkavalinta1 valittupaikka1 paikkavalinta2 paikkavalinta2]
       (println "paikkavallinnan arvot?" paikkavalinta1 paikkavalinta2)
       (if (not (and (or (= paikkavalinta1 "1") (= paikkavalinta1 "2") (= paikkavalinta1 "3") (= paikkavalinta1 "4") (= paikkavalinta1 "5"))
-               (or (= valittupaikka2 "1") (= valittupaikka2 "2") (= valittupaikka2 "3") (= valittupaikka2 "4") (= valittupaikka2 "5"))))
+               (or (= paikkavalinta2 "1") (= paikkavalinta2 "2") (= paikkavalinta2 "3") (= paikkavalinta2 "4") (= paikkavalinta2 "5"))))
         (do
           (println "These letters (" paikkavalinta1 " and " paikkavalinta2 ") aren't both 1, 2, 3, 4 or 5, please enter the letters again")
           (def palautettupaikka1 (read-line))
@@ -88,6 +82,33 @@
 
   ;kirjoita sitten syönti, tarkista onko kivenasetus järjestetty ennen syöntikutsua niin että kivi myös poistetaan
   ;Kirjoita syötyjen kivien poistamiskutsu. Kirjoita laitaListaan, poistaListasta (boardista)
+  )
+
+;ota board ja lisää siihen annetut paikkojen kohdat tietyksi vuoromerkiksi
+(defn lisaaListaan [board paikat vuoro]
+  (loop [i 0 uusiBoard board]
+    (when (< i (count paikat))
+      (type (get paikat i))
+      (if (= (+ i 1) (count paikat))
+        uusiBoard
+        (recur (inc i) (assoc-in uusiBoard (get paikat i) vuoro))
+        )
+      )
+    )
+  )
+
+;TARVITAANKO TÄTÄ!?
+;ota board ja poista siitä annetut paikkojen kohdat tietyksi merkiksi
+(defn poistaListatsta [board paikat merkki]
+  (loop [i 0 uusiBoard board]
+    (when (< i (count paikat))
+      (type (get paikat i))
+      (if (= (+ i 1) (count paikat))
+        uusiBoard
+        (recur (inc i) (assoc-in uusiBoard (get paikat i) merkki))
+        )
+      )
+    )
   )
 
 ;tarkistetaan onko paikassa oleva kivi syöty,
@@ -250,12 +271,13 @@
              ["W" "W" "W" "W" "W" "W" "W"]])
 (def valinta [3 3])
 ;(println (voikoAsettaaJaSyoda valinta board2))
-(println (aloitaPeli))
+;(println (aloitaPeli))
 ;(println (eikoVoiSyoda valinta board2))
 
 (def kivi [1 1])
 (def tarkistettavat [[1 1] [2 2]])
 (def annetut [[1 0] [1 2] [0 1] [2 1]])
+(println (lisaaListaan board2 annetut "G"))
 (if true
   (def annetut "taysin uusi arvonalustus")
   )
