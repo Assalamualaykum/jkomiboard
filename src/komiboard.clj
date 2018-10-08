@@ -2,20 +2,22 @@
 (ns komiboard
   (:gen-class))
 
-(declare onkoYmparoity ymparoidytKivet voikoSyoda initBoard aloitaPeli paikanValinta vuoronValinta lisaaListaan)
+(declare onkoYmparoity ymparoidytKivet voikoSyoda initBoard aloitaPeli paikanValinta vuoronValinta asetaListaan kivenAsetusJaTarkistus)
 
+;paikanValinta palauttaa valitun paikan muodossa [Y X]
+;voikoAsettaaJasSyoda taas settaa kiven mikälisen asettaminen on mahdollista ja palauttaa syötävät kivet.
 (defn aloitaPeli []
   (def board (initBoard))
-  ;lisäälistaan
-  (println board)
-  (vuoronValinta board) ;palauttaa valitun vuoron, R tai G
-  (paikanValinta board) ;palauttaa valitun paikan muodossa [Y X]
-  ;voikoAsettaaJaSyoda
+  (def tamanhetkinenVuoro (vuoronValinta))
+  (def valittuPaikka (paikanValinta))
+  ;jos if lause on totta ja paikka on sallittu, aseta kivi paikalleen
+  (kivenAsetusJaTarkistus valittuPaikka board tamanhetkinenVuoro)
   ;poistalistasta
   ;recur vaihdavuoro?
   )
 
 (defn initBoard []
+  (println "How about a game of komi, old friend")
   (def tyhjaBoard [["W" "W" "W" "W" "W" "W" "W"]
                ["W" "R" "G" "G" "R" "E" "W"]
                ["W" "R" "R" "G" "R" "E" "W"]
@@ -26,14 +28,7 @@
   tyhjaBoard
   )
 
-(defn vuoronValinta [board1]
-  (def board1 [["W" "W" "W" "W" "W" "W" "W"]
-               ["W" "R" "G" "G" "R" "E" "W"]
-               ["W" "R" "R" "G" "R" "E" "W"]
-               ["W" "E" "E" "E" "E" "E" "W"]
-               ["W" "E" "E" "E" "E" "E" "W"]
-               ["W" "E" "E" "E" "E" "E" "W"]
-               ["W" "W" "W" "W" "W" "W" "W"]])
+(defn vuoronValinta []
   (def valinta [1 1])
   (println "Which player starts? R for red, G for green")
 
@@ -52,7 +47,7 @@
     )
   )
 
-(defn paikanValinta [board2]
+(defn paikanValinta []
   (println kiviVuoro "Aloittaa, valitse ensimmäinen paikka johon aiot sijoittaa kiven,
       anna paikkvalintasi muodossa Y X, valitse paikoista [1 1] - [5 5]
       Anna ensin rivi, sitten sarake.")
@@ -75,17 +70,27 @@
         )
       )
     )
+  )
 
-  ;takista seuraavaksi voiko kivi syödä mitään, jos ei,
-  ;palauta vaarä liike
-  ;eikoVoiSyoda [paikka kentta]
+(defn kivenAsetusJaTarkistus [valittuPaikka board vuoro]
 
-  ;kirjoita sitten syönti, tarkista onko kivenasetus järjestetty ennen syöntikutsua niin että kivi myös poistetaan
-  ;Kirjoita syötyjen kivien poistamiskutsu. Kirjoita laitaListaan, poistaListasta (boardista)
+  (def palautetutPaikat (voikoAsettaaJaSyoda valittuPaikka board))
+
+  (if (= (typeof palautetutPaikat) clojure.lang.PersistentVector)
+    ;aseta uudet kivet taikka tyhjää kaikkiin paikkoihin
+        (asetaListaan board palautetutPaikat vuoro)
+      )
+    (if (= (typeof palautetutPaikat) java.lang.Long)
+      ;aseta vain alun perin valittu kivi
+      )
+    (if (nil? palautetutPaikat)
+      ;ala tee mitään ja huuda käyttäjälle vääränlaisesta asetuksesta
+      )
+    )
   )
 
 ;ota board ja lisää siihen annetut paikkojen kohdat tietyksi vuoromerkiksi
-(defn lisaaListaan [board paikat vuoro]
+(defn asetaListaan [board paikat vuoro]
   (loop [i 0 uusiBoard board]
     (when (< i (count paikat))
       (type (get paikat i))
@@ -100,16 +105,16 @@
 ;TARVITAANKO TÄTÄ!?
 ;ota board ja poista siitä annetut paikkojen kohdat tietyksi merkiksi
 (defn poistaListatsta [board paikat merkki]
-  (loop [i 0 uusiBoard board]
-    (when (< i (count paikat))
-      (type (get paikat i))
-      (if (= (+ i 1) (count paikat))
-        uusiBoard
-        (recur (inc i) (assoc-in uusiBoard (get paikat i) merkki))
-        )
-      )
-    )
-  )
+     (loop [i 0 uusiBoard board]
+       (when (< i (count paikat))
+         (type (get paikat i))
+         (if (= (+ i 1) (count paikat))
+           uusiBoard
+           (recur (inc i) (assoc-in uusiBoard (get paikat i) merkki))
+           )
+         )
+       )
+     )
 
 ;tarkistetaan onko paikassa oleva kivi syöty,
 ;kivi on syöty mikäli sitä ympäröivät kivet ovat joko vastustajan tai seiniä
@@ -270,14 +275,14 @@
              ["W" "E" "E" "E" "E" "E" "W"]
              ["W" "W" "W" "W" "W" "W" "W"]])
 (def valinta [3 3])
-;(println (voikoAsettaaJaSyoda valinta board2))
+(println (voikoAsettaaJaSyoda valinta board2))
 ;(println (aloitaPeli))
 ;(println (eikoVoiSyoda valinta board2))
 
 (def kivi [1 1])
 (def tarkistettavat [[1 1] [2 2]])
 (def annetut [[1 0] [1 2] [0 1] [2 1]])
-(println (lisaaListaan board2 annetut "G"))
+(println (asetaListaan board2 annetut "G"))
 (if true
   (def annetut "taysin uusi arvonalustus")
   )
