@@ -2,7 +2,7 @@
 (ns komiboard
   (:gen-class))
 
-(declare onkoYmparoity ymparoidytKivet voikoSyoda initBoard aloitaPeli paikanValinta vuoronValinta asetaListaan kivenAsetusJaTarkistus)
+(declare onkoYmparoity ymparoidytKivet voikoSyoda initBoard aloitaPeli paikanValinta vuoronValinta asetaListaan kivenAsetusJaTarkistus voikoAsettaaJaSyoda)
 
 ;paikanValinta palauttaa valitun paikan muodossa [Y X]
 ;voikoAsettaaJasSyoda taas settaa kiven mikälisen asettaminen on mahdollista ja palauttaa syötävät kivet.
@@ -76,18 +76,19 @@
 
   (def palautetutPaikat (voikoAsettaaJaSyoda valittuPaikka board))
 
-  (if (= (typeof palautetutPaikat) clojure.lang.PersistentVector)
+  (if (= (type palautetutPaikat) clojure.lang.PersistentVector)
     ;aseta uudet kivet taikka tyhjää kaikkiin paikkoihin
         (asetaListaan board palautetutPaikat vuoro)
       )
-    (if (= (typeof palautetutPaikat) java.lang.Long)
+    (if (= (type palautetutPaikat) java.lang.Long)
+      (println "")
       ;aseta vain alun perin valittu kivi
       )
     (if (nil? palautetutPaikat)
+      (println "")
       ;ala tee mitään ja huuda käyttäjälle vääränlaisesta asetuksesta
       )
     )
-  )
 
 ;ota board ja lisää siihen annetut paikkojen kohdat tietyksi vuoromerkiksi
 (defn asetaListaan [board paikat vuoro]
@@ -253,14 +254,19 @@
   (println vierekkaisetSyotavatPaikat "NAMA PITAISI SYODA")
   ;tarkistetaan aluksi onko paikka sallittu ja vapaana
   (if (= (eikoVoiSyoda paikka kentta) true)
-    (loop [i 0]
-      (when (< i (count vierekkaisetSyotavatPaikat))
-        (def tamanhetkinenPaikka (get vierekkaisetSyotavatPaikat i))
-        (println "Tamanhetkinen syova kivi" (get-in kentta tamanhetkinenPaikka))
-        (println "Rekursiohirvio palautti taman: " (rekursiohirvio tamanhetkinenPaikka kentta []))
-        (recur (+ i 1)) ;recur
-        );when
-      );loop
+    ;seuraavaksi vielä tarkistetaan voidaanko kivi vain asettaa paikalleen mikäli syötäviä kiviä ei ole
+    (if (not= 0 (count vierekkaisetSyotavatPaikat))
+            (loop [i 0]
+              (when (< i (count vierekkaisetSyotavatPaikat))
+                (def tamanhetkinenPaikka (get vierekkaisetSyotavatPaikat i))
+                (println "Tamanhetkinen syova kivi" (get-in kentta tamanhetkinenPaikka))
+                (println "Rekursiohirvio palautti taman: " (rekursiohirvio tamanhetkinenPaikka kentta [])) ;jos palauttaa jotakin, tee jotakin----------------------
+                (recur (+ i 1)) ;recur
+                )
+              ) ;loop
+            ;palautetaan numero yksi, tarkoitetaan että kivi voidaan asettaa ilman lisäseuraamuksia.
+            1
+            )
     (println "Ei loopattu, tahan ei voida asettaa kivea, syontiuhka tai kivi tiella")
     );if
   ;älä jatka
@@ -275,7 +281,9 @@
              ["W" "E" "E" "E" "E" "E" "W"]
              ["W" "W" "W" "W" "W" "W" "W"]])
 (def valinta [3 3])
+(def tyhjapaikka [4 4])
 (println (voikoAsettaaJaSyoda valinta board2))
+(println (voikoAsettaaJaSyoda tyhjapaikka board2))
 ;(println (aloitaPeli))
 ;(println (eikoVoiSyoda valinta board2))
 
