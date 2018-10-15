@@ -72,22 +72,22 @@
     )
   )
 
+;Tarkistetaan onko kiven asetus sallittua ja syödäänkö kiviä.
 (defn kivenAsetusJaTarkistus [valittuPaikka board vuoro]
 
   (def palautetutPaikat (voikoAsettaaJaSyoda valittuPaikka board))
 
-  (if (= (typeof palautetutPaikat) clojure.lang.PersistentVector)
+  (if (= palautetutPaikat 1)
     ;aseta uudet kivet taikka tyhjää kaikkiin paikkoihin
         (asetaListaan board palautetutPaikat vuoro)
       )
-    (if (= (typeof palautetutPaikat) java.lang.Long)
+  (if (= palautetutPaikat 2)
       ;aseta vain alun perin valittu kivi
       )
-    (if (nil? palautetutPaikat)
+  (if (nil? palautetutPaikat)
       ;ala tee mitään ja huuda käyttäjälle vääränlaisesta asetuksesta
       )
     )
-  )
 
 ;ota board ja lisää siihen annetut paikkojen kohdat tietyksi vuoromerkiksi
 (defn asetaListaan [board paikat vuoro]
@@ -118,19 +118,19 @@
 
 ;tarkistetaan onko paikassa oleva kivi syöty,
 ;kivi on syöty mikäli sitä ympäröivät kivet ovat joko vastustajan tai seiniä
-; palautusarvo nil mikäli ei mikäli kiveä ei voida syödä, true jos syöty
-(defn eikoVoiSyoda [paikka kentta]
-  (def ymparoivatKivet (ymparoidytKivet paikka kentta))
-  (def omaKivi (get-in kentta paikka))
-  (loop [i 0 vertailuarvo true]
-    (when (< i 4)
-      ;(println i)
-      ;lopeta mikäli vieressäoleva kivi on oma taikka tyhjä, ja palauta true
-      (if (or (= (get ymparoivatKivet i) "E")
-              (= (get ymparoivatKivet i) omaKivi))
-        vertailuarvo
-        (recur (inc i) (= vertailuarvo true))
-        )
+      ; palautusarvo nil mikäli ei mikäli kiveä ei voida syödä, true jos syöty
+      (defn eikoVoiSyoda [paikka kentta]
+        (def ymparoivatKivet (ymparoidytKivet paikka kentta))
+        (def omaKivi (get-in kentta paikka))
+        (loop [i 0 vertailuarvo true]
+          (when (< i 4)
+            ;(println i)
+            ;lopeta mikäli vieressäoleva kivi on oma taikka tyhjä, ja palauta true
+            (if (or (= (get ymparoivatKivet i) "E")
+                    (= (get ymparoivatKivet i) omaKivi))
+              vertailuarvo
+              (recur (inc i) (= vertailuarvo true))
+              )
       );when
     );loop
   )
