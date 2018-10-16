@@ -84,7 +84,7 @@
       (println "")
       ;aseta vain alun perin valittu kivi
       )
-    (if (nil? palautetutPaikat)
+    (if (= palautetutPaikat 2)
       (println "")
       ;ala tee mitään ja huuda käyttäjälle vääränlaisesta asetuksesta
       )
@@ -120,16 +120,17 @@
 ;tarkistetaan onko paikassa oleva kivi syöty,
 ;kivi on syöty mikäli sitä ympäröivät kivet ovat joko vastustajan tai seiniä
 ; palautusarvo nil mikäli ei mikäli kiveä ei voida syödä, true jos syöty
-(defn eikoVoiSyoda [paikka kentta]
+(defn onkoSyoty [paikka kentta]
   (def ymparoivatKivet (ymparoidytKivet paikka kentta))
   (def omaKivi (get-in kentta paikka))
-  (loop [i 0 vertailuarvo true]
+  true
+  (loop [i 0 vertailuarvo false]
     (when (< i 4)
       ;(println i)
       ;lopeta mikäli vieressäoleva kivi on oma taikka tyhjä, ja palauta true
       (if (or (= (get ymparoivatKivet i) "E")
               (= (get ymparoivatKivet i) omaKivi))
-        vertailuarvo
+        false
         (recur (inc i) (= vertailuarvo true))
         )
       );when
@@ -173,7 +174,7 @@
                             (get annetutSivuPaikat i)
                             ;(println "else")
                             ))
-      (println lisattavaKohta "asda" syontiTarkistettavat)
+      (println lisattavaKohta "(lisattava ja tarkistettavat)" syontiTarkistettavat)
       (println (not (or (= tarkasteltavaKivi "W") (= tarkasteltavaKivi "E") (= tarkasteltavaKivi asetettavaKivi))))
 
       (println "loopattava " tarkasteltavaKivi)
@@ -253,7 +254,7 @@
   (def vierekkaisetSyotavatPaikat (otaSyotavat paikka kentta))
   (println vierekkaisetSyotavatPaikat "NAMA PITAISI SYODA")
   ;tarkistetaan aluksi onko paikka sallittu ja vapaana
-  (if (= (eikoVoiSyoda paikka kentta) true)
+  (if (= (onkoSyoty paikka kentta) true)
     ;seuraavaksi vielä tarkistetaan voidaanko kivi vain asettaa paikalleen mikäli syötäviä kiviä ei ole
     (if (not= 0 (count vierekkaisetSyotavatPaikat))
             (loop [i 0]
@@ -267,7 +268,8 @@
             ;palautetaan numero yksi, tarkoitetaan että kivi voidaan asettaa ilman lisäseuraamuksia.
             1
             )
-    (println "Ei loopattu, tahan ei voida asettaa kivea, syontiuhka tai kivi tiella")
+    ;palautetaan numero kaksi, Ei loopattu, tahan ei voida asettaa kivea, syontiuhka tai kivi tiella
+    2
     );if
   ;älä jatka
   )
@@ -277,21 +279,18 @@
              ["W" "R" "G" "G" "R" "E" "W"]
              ["W" "R" "R" "G" "R" "E" "W"]
              ["W" "E" "E" "E" "E" "E" "W"]
-             ["W" "E" "E" "E" "E" "E" "W"]
-             ["W" "E" "E" "E" "E" "E" "W"]
+             ["W" "E" "E" "E" "E" "G" "W"]
+             ["W" "E" "E" "E" "R" "E" "W"]
              ["W" "W" "W" "W" "W" "W" "W"]])
 (def valinta [3 3])
 (def tyhjapaikka [4 4])
 (println (voikoAsettaaJaSyoda valinta board2))
 (println (voikoAsettaaJaSyoda tyhjapaikka board2))
 ;(println (aloitaPeli))
-;(println (eikoVoiSyoda valinta board2))
+(def valinta [5 5])
+(println (onkoSyoty valinta board2))
 
-(def kivi [1 1])
-(def tarkistettavat [[1 1] [2 2]])
-(def annetut [[1 0] [1 2] [0 1] [2 1]])
-(println (asetaListaan board2 annetut "G"))
-(if true
-  (def annetut "taysin uusi arvonalustus")
-  )
-(println annetut)
+;(def tarkistettavat [[1 1] [2 2]])
+;(def annetut [[1 0] [1 2] [0 1] [2 1]])
+;(println (asetaListaan board2 annetut "G"))
+;(println annetut)
