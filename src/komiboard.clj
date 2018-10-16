@@ -72,20 +72,19 @@
     )
   )
 
+;Tarkistetaan onko kiven asetus sallittua ja syödäänkö kiviä.
 (defn kivenAsetusJaTarkistus [valittuPaikka board vuoro]
 
   (def palautetutPaikat (voikoAsettaaJaSyoda valittuPaikka board))
 
-  (if (= (type palautetutPaikat) clojure.lang.PersistentVector)
+  (if (= palautetutPaikat 1)
     ;aseta uudet kivet taikka tyhjää kaikkiin paikkoihin
         (asetaListaan board palautetutPaikat vuoro)
       )
-    (if (= (type palautetutPaikat) java.lang.Long)
-      (println "")
+  (if (= palautetutPaikat 2)
       ;aseta vain alun perin valittu kivi
       )
-    (if (= palautetutPaikat 2)
-      (println "")
+  (if (nil? palautetutPaikat)
       ;ala tee mitään ja huuda käyttäjälle vääränlaisesta asetuksesta
       )
     )
