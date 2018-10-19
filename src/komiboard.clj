@@ -2,7 +2,7 @@
 (ns komiboard
   (:gen-class))
 
-(declare onkoYmparoity ymparoidytKivet voikoSyoda initBoard aloitaPeli paikanValinta vuoronValinta asetaListaan kivenAsetusJaTarkistus voikoAsettaaJaSyoda)
+(declare onkoYmparoity ymparoidytKivet voikoSyoda initBoard aloitaPeli paikanValinta vuoronValinta asetaListaan poistaListasta kivenAsetusJaTarkistus voikoAsettaaJaSyoda)
 
 ;paikanValinta palauttaa valitun paikan muodossa [Y X]
 ;voikoAsettaaJasSyoda taas settaa kiven mikälisen asettaminen on mahdollista ja palauttaa syötävät kivet.
@@ -113,7 +113,7 @@
 
 ;TARVITAANKO TÄTÄ!?
 ;ota board ja poista siitä annetut paikkojen kohdat tietyksi merkiksi
-(defn poistaListatsta [board paikat merkki]
+(defn poistaListasta [board paikat merkki]
      (loop [i 0 uusiBoard board]
        (when (< i (count paikat))
          (type (get paikat i))
@@ -131,18 +131,20 @@
 (defn onkoSyoty [paikka kentta]
   (def ymparoivatKivet (ymparoidytKivet paikka kentta))
   (def omaKivi (get-in kentta paikka))
-  true
-  (loop [i 0 vertailuarvo false]
-    (when (< i 4)
-      ;(println i)
-      ;lopeta mikäli vieressäoleva kivi on oma taikka tyhjä, ja palauta true
-      (if (or (= (get ymparoivatKivet i) "E")
-              (= (get ymparoivatKivet i) omaKivi))
-        false
-        (recur (inc i) (= vertailuarvo true))
-        )
-      );when
-    );loop
+    (loop [i 0]
+      (when (< i 4)
+        (println i)
+        ;lopeta mikäli vieressäoleva kivi on oma taikka tyhjä, ja palauta false
+        (if (or (= (get ymparoivatKivet i) "E")
+                (= (get ymparoivatKivet i) omaKivi))
+          false
+          (if (= i 3)
+            true
+            (recur (inc i))
+            )
+          )
+        ) ;when
+      ) ;loop
   )
 
 ;Funktio palauttaa kutsuttavaa paikkaa ympäröivät kivet jarjestyksessa vasen, oikea, yla, ala
@@ -182,16 +184,16 @@
                             (get annetutSivuPaikat i)
                             ;(println "else")
                             ))
-      (println lisattavaKohta "(lisattava ja tarkistettavat)" syontiTarkistettavat)
-      (println (not (or (= tarkasteltavaKivi "W") (= tarkasteltavaKivi "E") (= tarkasteltavaKivi asetettavaKivi))))
+      ;(println lisattavaKohta "(lisattava ja tarkistettavat)" syontiTarkistettavat)
+      ;(println (not (or (= tarkasteltavaKivi "W") (= tarkasteltavaKivi "E") (= tarkasteltavaKivi asetettavaKivi))))
 
-      (println "loopattava " tarkasteltavaKivi)
-      (println "permakivi " asetettavaKivi)
+      ;(println "loopattava " tarkasteltavaKivi)
+      ;(println "permakivi " asetettavaKivi)
 
-      (println "testit")
-      (println (= tarkasteltavaKivi "W"))
-      (println (= tarkasteltavaKivi "E"))
-      (println (= tarkasteltavaKivi asetettavaKivi))
+      ;(println "testit")
+      ;(println (= tarkasteltavaKivi "W"))
+      ;(println (= tarkasteltavaKivi "E"))
+      ;(println (= tarkasteltavaKivi asetettavaKivi))
 
       ) ;When
     ;tässä korjaan lisättävän arvon nil arvon tyhjäksi
@@ -290,8 +292,8 @@
              ["W" "R" "G" "G" "R" "E" "W"]
              ["W" "R" "R" "G" "R" "E" "W"]
              ["W" "E" "E" "E" "E" "E" "W"]
-             ["W" "E" "E" "E" "E" "G" "W"]
-             ["W" "E" "E" "E" "R" "E" "W"]
+             ["W" "E" "E" "E" "E" "E" "W"]
+             ["W" "E" "E" "E" "G" "E" "W"]
              ["W" "W" "W" "W" "W" "W" "W"]])
 (def valinta [3 3])
 (def tyhjapaikka [4 4])
@@ -299,7 +301,7 @@
 (println (voikoAsettaaJaSyoda tyhjapaikka board2 "R"))
 ;(println (aloitaPeli))
 (def valinta [5 5])
-(println (onkoSyoty valinta board2))
+(println (onkoSyoty valinta board2)) ;ei palauta mitään? = false? Tarvii tweekkausta
 
 ;(def tarkistettavat [[1 1] [2 2]])
 ;(def annetut [[1 0] [1 2] [0 1] [2 1]])
