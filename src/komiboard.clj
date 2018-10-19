@@ -75,17 +75,26 @@
 ;Tarkistetaan onko kiven asetus sallittua ja syödäänkö kiviä.
 (defn kivenAsetusJaTarkistus [valittuPaikka board vuoro]
 
-  (def palautetutPaikat (voikoAsettaaJaSyoda valittuPaikka board))
+  (def palautetutPaikat (voikoAsettaaJaSyoda valittuPaikka board vuoro))
 
+  ;vaihtoehto, syödään
   (if (= palautetutPaikat 1)
     ;aseta uudet kivet taikka tyhjää kaikkiin paikkoihin
-        (asetaListaan board palautetutPaikat vuoro)
+    (asetaListaan board palautetutPaikat vuoro)
       )
+  ;vaihtoehto, asetetaan ilman syöntiä
   (if (= palautetutPaikat 2)
-      ;aseta vain alun perin valittu kivi
-      )
+    ;aseta vain alun perin valittu kivi
+    (println "Kiven asetus ilman lisatoimia")
+    )
+  (if (= palautetutPaikat 3)
+    ;Älä tee mitään, paikka oli jo varattu
+    (println "Ei mitään")
+    )
+  ;vaihtoehto, väärä asetus päällekkäinen tai ympäröity?
   (if (nil? palautetutPaikat)
       ;ala tee mitään ja huuda käyttäjälle vääränlaisesta asetuksesta
+      (println "Ei mitään 2")
       )
     )
 
@@ -249,28 +258,31 @@
   )
 
 ;Tarkistetaan voiko seuraavaksi asetettava kivi syödä vieresssäolevia kiviä, ja lisätään se listaan
-(defn voikoAsettaaJaSyoda [paikka kentta]
+(defn voikoAsettaaJaSyoda [paikka kentta vuoro]
   (def vierekkaisetSyotavatPaikat (otaSyotavat paikka kentta))
   (println vierekkaisetSyotavatPaikat "NAMA PITAISI SYODA")
-  ;tarkistetaan aluksi onko paikka sallittu ja vapaana
-  (if (= (onkoSyoty paikka kentta) true)
-    ;seuraavaksi vielä tarkistetaan voidaanko kivi vain asettaa paikalleen mikäli syötäviä kiviä ei ole
-    (if (not= 0 (count vierekkaisetSyotavatPaikat))
-            (loop [i 0]
-              (when (< i (count vierekkaisetSyotavatPaikat))
-                (def tamanhetkinenPaikka (get vierekkaisetSyotavatPaikat i))
-                (println "Tamanhetkinen syova kivi" (get-in kentta tamanhetkinenPaikka))
-                (println "Rekursiohirvio palautti taman: " (rekursiohirvio tamanhetkinenPaikka kentta [])) ;jos palauttaa jotakin, tee jotakin----------------------
-                (recur (+ i 1)) ;recur
-                )
-              ) ;loop
-            ;palautetaan numero yksi, tarkoitetaan että kivi voidaan asettaa ilman lisäseuraamuksia.
-            1
+  ;tarkistetaan onko paikka jo varattu
+  (if (not= vuoro paikka)
+    ;tarkistetaan aluksi onko paikka sallittu ja vapaana
+    (if (and (= (onkoSyoty paikka kentta) true) ) ;------------------------------------------------------------------------------------
+      ;seuraavaksi vielä tarkistetaan voidaanko kivi vain asettaa paikalleen mikäli syötäviä kiviä ei ole
+      (if (not= 0 (count vierekkaisetSyotavatPaikat))
+        (loop [i 0]
+          (when (< i (count vierekkaisetSyotavatPaikat))
+            (def tamanhetkinenPaikka (get vierekkaisetSyotavatPaikat i))
+            (println "Tamanhetkinen syova kivi" (get-in kentta tamanhetkinenPaikka))
+            (println "Rekursiohirvio palautti taman: " (rekursiohirvio tamanhetkinenPaikka kentta [])) ;jos palauttaa jotakin, tee jotakin----------------------
+            (recur (+ i 1)) ;recur
             )
-    ;palautetaan numero kaksi, Ei loopattu, tahan ei voida asettaa kivea, syontiuhka tai kivi tiella
-    2
-    );if
-  ;älä jatka
+          ) ;loop
+        ;palautetaan numero yksi, tarkoitetaan että kivi voidaan asettaa ilman lisäseuraamuksia.
+        1
+        );if 3
+      ;palautetaan numero kaksi, Ei loopattu, tahan ei voida asettaa kivea, syontiuhka tai kivi tiella
+      2
+      );if 2
+    3
+    );if 1
   )
 
 ;ennen asetusta tulee tyhjään paikkaan asettaa vuoronomistajan kivi, ja poistaa se asetustestin jälkeen
@@ -283,8 +295,8 @@
              ["W" "W" "W" "W" "W" "W" "W"]])
 (def valinta [3 3])
 (def tyhjapaikka [4 4])
-(println (voikoAsettaaJaSyoda valinta board2))
-(println (voikoAsettaaJaSyoda tyhjapaikka board2))
+(println (voikoAsettaaJaSyoda valinta board2 "R"))
+(println (voikoAsettaaJaSyoda tyhjapaikka board2 "R"))
 ;(println (aloitaPeli))
 (def valinta [5 5])
 (println (onkoSyoty valinta board2))
