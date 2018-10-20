@@ -77,25 +77,32 @@
 ;Tarkistetaan onko kiven asetus sallittua ja syödäänkö kiviä.
 (defn kivenAsetusJaTarkistus [valittuPaikka board vuoro]
 
-  (def palautetutPaikat (voikoAsettaaJaSyoda valittuPaikka board vuoro))
+  (def palautetutPaikat (valittuPaikka voikoAsettaaJaSyoda board vuoro))
 
-  (if (= palautetutPaikat 1)
-    ;vaihtoehto, syödään
-    ;aseta uudet kivet taikka tyhjää kaikkiin paikkoihin
-    (asetaListaan board palautetutPaikat vuoro)
-      )
   ;vaihtoehto, asetetaan ilman syöntiä
-  (if (= palautetutPaikat 2)
-    ;aseta vain alun perin valittu kivi
+  (if (= palautetutPaikat 1)
+    ;aseta vain alun perin valittu kivi, ei syötäviä paikkoja
     (println "Kiven asetus ilman lisatoimia")
     )
-  (if (= palautetutPaikat 3)
-    ;Älä tee mitään, paikka oli jo varattu
-    (println "Ei mitään")
+  ;vaihtoehto, ympäröity
+  (if (= palautetutPaikat 2)
+    ;ala tee mitään ja huuda käyttäjälle vääränlaisesta asetuksesta
+    (println "Valittu paikka on ympäröity")
     )
-  ;vaihtoehto, väärä asetus päällekkäinen tai ympäröity?
-  (if (nil? palautetutPaikat)
-      ;ala tee mitään ja huuda käyttäjälle vääränlaisesta asetuksesta
+  ;vaihtoehto, varattu
+  (if (= palautetutPaikat 3)
+    ;ala tee mitään ja huuda käyttäjälle vääränlaisesta asetuksesta
+  (println "Valitussa paikassa on jo kivi")
+    )
+  ;vaihtoehto, asetetaan ja syödään
+  (if (not (contains? palautetutPaikat nil))
+    ;vaihtoehto, syödään
+    ;aseta tyhjää kaikkiin syötyihin paikkoihin
+    (asetaListaan board palautetutPaikat vuoro)
+    )
+  ;vaihtoehto, rekursiohirviö kutsuttu mutta ei syödä
+  (if (contains? palautetutPaikat nil)
+      ;älä syö, mutta aseta vuoron omistajan kivi
       (println "Ei mitään 2")
       )
     )
@@ -266,8 +273,8 @@
   (println vierekkaisetSyotavatPaikat "NAMA PITAISI SYODA")
   ;tarkistetaan onko paikka jo varattu
   (if (not= vuoro paikka)
-    ;tarkistetaan aluksi onko paikka sallittu ja vapaana
-    (if (and (= (onkoSyoty paikka kentta vuoro) false) TÄHÄN VIELÄ JOS TIELLÄ ON JO KIVI) ;------------------------------------------------------------------------------------
+    ;tarkistetaan aluksi onko paikka sallittu eli siis sitä ei ole ympäröity
+    (if (= (onkoSyoty paikka kentta vuoro) false)
       ;seuraavaksi vielä tarkistetaan voidaanko kivi vain asettaa paikalleen mikäli syötäviä kiviä ei ole
       (if (not= 0 (count vierekkaisetSyotavatPaikat))
         (loop [i 0]
