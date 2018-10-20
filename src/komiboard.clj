@@ -14,6 +14,8 @@
   (kivenAsetusJaTarkistus valittuPaikka board tamanhetkinenVuoro)
   ;poistalistasta
   ;recur vaihdavuoro?
+  ;tilannetta jossa pelaaja asettaa kivensä tyhjään kohtaan jossa kaikki ympäröivät kivet ovat omia,
+    ;jotka kuitenkin ovat kaikki vihollisen ympäröimiä ei ole tarkistettu
   )
 
 (defn initBoard []
@@ -77,8 +79,8 @@
 
   (def palautetutPaikat (voikoAsettaaJaSyoda valittuPaikka board vuoro))
 
-  ;vaihtoehto, syödään
   (if (= palautetutPaikat 1)
+    ;vaihtoehto, syödään
     ;aseta uudet kivet taikka tyhjää kaikkiin paikkoihin
     (asetaListaan board palautetutPaikat vuoro)
       )
@@ -128,15 +130,14 @@
 ;tarkistetaan onko paikassa oleva kivi syöty,
 ;kivi on syöty mikäli sitä ympäröivät kivet ovat joko vastustajan tai seiniä
 ; palautusarvo nil mikäli ei mikäli kiveä ei voida syödä, true jos syöty
-(defn onkoSyoty [paikka kentta]
+(defn onkoSyoty [paikka kentta vuoro]
   (def ymparoivatKivet (ymparoidytKivet paikka kentta))
-  (def omaKivi (get-in kentta paikka))
     (loop [i 0]
       (when (< i 4)
         (println i)
         ;lopeta mikäli vieressäoleva kivi on oma taikka tyhjä, ja palauta false
         (if (or (= (get ymparoivatKivet i) "E")
-                (= (get ymparoivatKivet i) omaKivi))
+                (= (get ymparoivatKivet i) vuoro))
           false
           (if (= i 3)
             true
@@ -266,7 +267,7 @@
   ;tarkistetaan onko paikka jo varattu
   (if (not= vuoro paikka)
     ;tarkistetaan aluksi onko paikka sallittu ja vapaana
-    (if (and (= (onkoSyoty paikka kentta) true) ) ;------------------------------------------------------------------------------------
+    (if (and (= (onkoSyoty paikka kentta vuoro) false) TÄHÄN VIELÄ JOS TIELLÄ ON JO KIVI) ;------------------------------------------------------------------------------------
       ;seuraavaksi vielä tarkistetaan voidaanko kivi vain asettaa paikalleen mikäli syötäviä kiviä ei ole
       (if (not= 0 (count vierekkaisetSyotavatPaikat))
         (loop [i 0]
@@ -292,7 +293,7 @@
              ["W" "R" "G" "G" "R" "E" "W"]
              ["W" "R" "R" "G" "R" "E" "W"]
              ["W" "E" "E" "E" "E" "E" "W"]
-             ["W" "E" "E" "E" "E" "E" "W"]
+             ["W" "E" "E" "E" "E" "G" "W"]
              ["W" "E" "E" "E" "G" "E" "W"]
              ["W" "W" "W" "W" "W" "W" "W"]])
 (def valinta [3 3])
@@ -301,7 +302,7 @@
 (println (voikoAsettaaJaSyoda tyhjapaikka board2 "R"))
 ;(println (aloitaPeli))
 (def valinta [5 5])
-(println (onkoSyoty valinta board2)) ;ei palauta mitään? = false? Tarvii tweekkausta
+(println (onkoSyoty valinta board2 "R")) ;tee vielä niin että tämä ottaa humioon vuoron
 
 ;(def tarkistettavat [[1 1] [2 2]])
 ;(def annetut [[1 0] [1 2] [0 1] [2 1]])
