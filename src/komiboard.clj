@@ -16,6 +16,8 @@
   ;recur vaihdavuoro?
   ;tilannetta jossa pelaaja asettaa kivensä tyhjään kohtaan jossa kaikki ympäröivät kivet ovat omia,
     ;jotka kuitenkin ovat kaikki vihollisen ympäröimiä ei ole tarkistettu
+
+  ;miten boardia päivitetään? for looppi?
   )
 
 (defn initBoard []
@@ -267,7 +269,8 @@
     ); if-1 tarkistatyhja
   )
 
-;Tarkistetaan voiko seuraavaksi asetettava kivi syödä vieresssäolevia kiviä, ja lisätään se listaan
+;Tarkistetaan voiko seuraavaksi asetettava kivi syödä vieresssäolevia kiviä, ja jos pystyy, kutsuu rekursiohirviötä
+  ;Mikäli rekursiohirviön seurauksena asetetaan uusi kivi kenttään, kutsu palauttaa uuden kentän johon uusi kivi on sijoitettu
 (defn voikoAsettaaJaSyoda [paikka kentta vuoro]
   (def vierekkaisetSyotavatPaikat (otaSyotavat paikka kentta))
   (println vierekkaisetSyotavatPaikat "NAMA PITAISI SYODA")
@@ -277,12 +280,24 @@
     (if (= (onkoSyoty paikka kentta vuoro) false)
       ;seuraavaksi vielä tarkistetaan voidaanko kivi vain asettaa paikalleen mikäli syötäviä kiviä ei ole
       (if (not= 0 (count vierekkaisetSyotavatPaikat))
+        ;tässä loopissa käydään kutsumassa rekursiohirviötä jokaiselle syötävälle kivelle
+          ;optimoinnin vuoksi syönti tehdään heti sen jälkeen kun rekursiohirviö palauttaa syötäviä paikkoja
         (loop [i 0]
           (when (< i (count vierekkaisetSyotavatPaikat))
             (def tamanhetkinenPaikka (get vierekkaisetSyotavatPaikat i))
             (println "Tamanhetkinen syova kivi" (get-in kentta tamanhetkinenPaikka))
-            (println "Rekursiohirvio palautti taman: " (rekursiohirvio tamanhetkinenPaikka kentta [])) ;jos palauttaa jotakin, tee jotakin----------------------
-            (recur (+ i 1)) ;recur
+            (def rekursionPalautus (rekursiohirvio tamanhetkinenPaikka kentta []))
+            (if (not (contains? rekursionPalautus nil))
+              ;vaihtoehto, syödään
+              ;aseta tyhjää kaikkiin syötyihin paikkoihin
+              (asetaListaan board palautetutPaikat vuoro)
+              )
+            ;vaihtoehto, rekursiohirviö kutsuttu mutta ei syödä
+            (if (contains? rekursionPalautus nil)
+              ;älä syö, mutta aseta vuoron omistajan kivi
+              (println "Ei mitään 2")
+              )
+            (recur (+ i 1)) ;recuraa
             )
           ) ;loop
         ;palautetaan numero yksi, tarkoitetaan että kivi voidaan asettaa ilman lisäseuraamuksia.
