@@ -111,13 +111,22 @@
 
 ;ota board ja lisää siihen annetut paikkojen kohdat tietyksi vuoromerkiksi
 (defn asetaListaan [board paikat vuoro]
-  (loop [i 0 uusiBoard board]
-    (println "Testejä" paikat " " (get paikat i))
-    (when (< i (count paikat))
-      (println (type (get paikat i)))
-      (if (= (+ i 1) (count paikat))
-        uusiBoard
-        (recur (inc i) (assoc-in uusiBoard (get paikat i) vuoro))
+  (println "Testejä" paikat " " )
+  (println "Testejä" paikat " " (some paikat vector?))
+  (if (some paikat vector?)
+    ;true, aseta vain annettu paikka
+    (let [uusiBoard (assoc-in board paikat vuoro)]
+      uusiBoard
+      )
+    ;else, aseta vektorissa paikat annettuun kenttään
+    (loop [i 0 uusiBoard board]
+      (println "Testejä" paikat " " (get paikat i))
+      (when (< i (count paikat))
+        (println (type (get paikat i)))
+        (if (= (+ i 1) (count paikat))
+          uusiBoard
+          (recur (inc i) (assoc-in uusiBoard (get paikat i) vuoro))
+          )
         )
       )
     )
@@ -292,16 +301,17 @@
               (println "Tamanhetkinen syova kivi" (get-in kentta tamanhetkinenPaikka))
               (def rekursionPalautus (rekursiohirvio tamanhetkinenPaikka kentta []))
               ;vaihtoehto, syödään
-              ;(def rekursionPalautus [[4 5] [4 4]])
               (println "TESTIT 2 " paikka palautettavaBoard rekursionPalautus)
-              (println "TESTIT 3 " (not (contains? rekursionPalautus nil)) (contains? rekursionPalautus nil))
-              (if (not (contains? rekursionPalautus nil))
+              (println "TESTIT 3 " (some nil? rekursionPalautus))
+              (if (some nil? rekursionPalautus)
+                ;Aseta kivi valittuun paikkaan ilman syöntiä
+                (recur (+ i 1) (asetaListaan palautettavaBoard paikka vuoro))
                 ;aseta tyhjää kaikkiin syötyihin paikkoihin
                 (let [uusiboard (asetaListaan palautettavaBoard rekursionPalautus "E")] ;-------------------------------ASETALISTAAN TOIMII LISTALLA JOSSA NIL
                   (println "ÄLÄ MEE TÄHÄN NIL ARVOJEN KANSSA")
+                  (println "Syodaan paikat: " rekursionPalautus " Ja asetettiin kivi '" vuoro "' kohtaan '" paikka "'")
                   (recur (+ i 1) (asetaListaan uusiboard paikka vuoro))
                   )
-                (recur (+ i 1) (asetaListaan palautettavaBoard paikka vuoro))
                 )
               ;vaihtoehto, rekursiohirviö kutsuttu mutta ei syödä
               ;(if (contains? rekursionPalautus nil)
@@ -323,17 +333,17 @@
     );if 1
   )
 
-;ennen asetusta tulee tyhjään paikkaan asettaa vuoronomistajan kivi, ja poistaa se asetustestin jälkeen
+
 (def board2 [["W" "W" "W" "W" "W" "W" "W"]
              ["W" "R" "G" "G" "R" "E" "W"]
              ["W" "R" "R" "G" "R" "E" "W"]
-             ["W" "E" "E" "E" "E" "E" "W"]
-             ["W" "E" "E" "E" "E" "G" "W"]
+             ["W" "E" "R" "E" "R" "E" "W"]
+             ["W" "E" "E" "R" "E" "G" "W"]
              ["W" "E" "E" "E" "G" "E" "W"]
              ["W" "W" "W" "W" "W" "W" "W"]])
 (def valinta [3 3])
 (def tyhjapaikka [4 4])
-;(println (voikoAsettaaJaSyoda valinta board2 "R"))
+(println (voikoAsettaaJaSyoda valinta board2 "R")) ;ei toimi sillä paikka johon asetetaan on tyhjä, rekursiohirviö kusee
 ;(println (voikoAsettaaJaSyoda tyhjapaikka board2 "R"))
 ;(println (aloitaPeli))
 (def valinta [5 5])
@@ -350,4 +360,4 @@
 (println "TESTIT 3 " (not (contains? rekursionPalautus nil)) (contains? rekursionPalautus nil))
 
 (def asd [[4 5] [4 4] nil])
-(println "TESTIT 3 " (not (contains? asd nil)) (contains? asd nil))
+(println "TESTIT 3 "  (some nil? asd) (some nil? rekursionPalautus))
