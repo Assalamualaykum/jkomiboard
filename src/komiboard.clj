@@ -111,14 +111,12 @@
 
 ;ota board ja lisää siihen annetut paikkojen kohdat tietyksi vuoromerkiksi
 (defn asetaListaan [board paikat vuoro]
-  (println "Testejä" paikat " " )
-  (println "Testejä" paikat " " (some paikat vector?))
-  (if (some paikat vector?)
-    ;true, aseta vain annettu paikka
-    (let [uusiBoard (assoc-in board paikat vuoro)]
-      uusiBoard
-      )
-    ;else, aseta vektorissa paikat annettuun kenttään
+  (println "Testejä" paikat " " (instance? clojure.lang.PersistentVector paikat))
+  ;(def paikat [[1 1]])
+  ;(def paikat (get paikat 1))
+  (println "Testejä" paikat (get paikat 1)" " (instance? clojure.lang.PersistentVector (get paikat 0)))
+  (if (instance? clojure.lang.PersistentVector (get paikat 0))
+    ;true, aseta vektorissa paikat annettuun kenttään
     (loop [i 0 uusiBoard board]
       (println "Testejä" paikat " " (get paikat i))
       (when (< i (count paikat))
@@ -128,6 +126,10 @@
           (recur (inc i) (assoc-in uusiBoard (get paikat i) vuoro))
           )
         )
+      )
+    ;else, aseta vain annettu paikka
+    (let [uusiBoard (assoc-in board paikat vuoro)]
+      uusiBoard
       )
     )
   )
@@ -285,50 +287,53 @@
   (def vierekkaisetSyotavatPaikat (otaSyotavat paikka kentta))
   (println vierekkaisetSyotavatPaikat "NAMA PITAISI SYODA")
   ;tarkistetaan onko paikka jo varattu
-  (if (not= vuoro paikka)
-    ;tarkistetaan aluksi onko paikka sallittu eli siis sitä ei ole ympäröity
-    (if (= (onkoSyoty paikka kentta vuoro) false)
-      ;seuraavaksi vielä tarkistetaan voidaanko kivi vain asettaa paikalleen mikäli syötäviä kiviä ei ole
-      (if (not= 0 (count vierekkaisetSyotavatPaikat))
-        ;tässä loopissa käydään kutsumassa rekursiohirviötä jokaiselle syötävälle kivelle
-          ;optimoinnin vuoksi syönti tehdään heti sen jälkeen kun rekursiohirviö palauttaa syötäviä paikkoja
-        (loop [i 0 palautettavaBoard kentta]
-          (when (< i (+ (count vierekkaisetSyotavatPaikat) 1))
-            ;tämä if lause on viimeistä looppia varten jolloin uusiboard palautetaan varsinaisen loopin sijaan
-            (if (< i (count vierekkaisetSyotavatPaikat))
-            (do
-              (def tamanhetkinenPaikka (get vierekkaisetSyotavatPaikat i))
-              (println "Tamanhetkinen syova kivi" (get-in kentta tamanhetkinenPaikka))
-              (def rekursionPalautus (rekursiohirvio tamanhetkinenPaikka kentta []))
-              ;vaihtoehto, syödään
-              (println "TESTIT 2 " paikka palautettavaBoard rekursionPalautus)
-              (println "TESTIT 3 " (some nil? rekursionPalautus))
-              (if (some nil? rekursionPalautus)
-                ;Aseta kivi valittuun paikkaan ilman syöntiä
-                (recur (+ i 1) (asetaListaan palautettavaBoard paikka vuoro))
-                ;aseta tyhjää kaikkiin syötyihin paikkoihin
-                (let [uusiboard (asetaListaan palautettavaBoard rekursionPalautus "E")] ;-------------------------------ASETALISTAAN TOIMII LISTALLA JOSSA NIL
-                  (println "ÄLÄ MEE TÄHÄN NIL ARVOJEN KANSSA")
-                  (println "Syodaan paikat: " rekursionPalautus " Ja asetettiin kivi '" vuoro "' kohtaan '" paikka "'")
-                  (recur (+ i 1) (asetaListaan uusiboard paikka vuoro))
+  (if (not= vuoro paikka) ;-------------------------------------------------mimkä vitttu tää on olevinaan? eri kuin asetettava kivi? intä jos valli tai vastustaja
+      ;tarkistetaan aluksi onko paikka sallittu eli siis sitä ei ole ympäröity
+      (if (= (onkoSyoty paikka kentta vuoro) false)
+        ;seuraavaksi vielä tarkistetaan voidaanko kivi vain asettaa paikalleen mikäli syötäviä kiviä ei ole
+        (if (not= 0 (count vierekkaisetSyotavatPaikat))
+          ;tällä let-sidonnalla tehdään muuttujasta kenttä lokaali versio jossa kivi on asetettu aiemmin valittuun paikkaan kentässä
+          (let [kentta (asetaListaan kentta paikka vuoro)]
+            ;tässä loopissa käydään kutsumassa rekursiohirviötä jokaiselle syötävälle kivelle
+            ;optimoinnin vuoksi syönti tehdään heti sen jälkeen kun rekursiohirviö palauttaa syötäviä paikkoja
+            (loop [i 0 palautettavaBoard kentta]
+              (when (< i (+ (count vierekkaisetSyotavatPaikat) 1))
+                ;tämä if lause on viimeistä looppia varten jolloin uusiboard palautetaan varsinaisen loopin sijaan
+                (if (< i (count vierekkaisetSyotavatPaikat))
+                  (do
+                    (def tamanhetkinenPaikka (get vierekkaisetSyotavatPaikat i))
+                    (println "Tamanhetkinen syova kivi" (get-in kentta tamanhetkinenPaikka))
+                    (def rekursionPalautus (rekursiohirvio tamanhetkinenPaikka kentta []))
+                    ;vaihtoehto, syödään
+                    (println "TESTIT 2 " paikka palautettavaBoard rekursionPalautus)
+                    (println "TESTIT 3 " (some nil? rekursionPalautus))
+                    (if (some nil? rekursionPalautus)
+                      ;Aseta kivi valittuun paikkaan ilman syöntiä
+                      (recur (+ i 1) (asetaListaan palautettavaBoard paikka vuoro))
+                      ;aseta tyhjää kaikkiin syötyihin paikkoihin
+                      (let [uusiboard (asetaListaan palautettavaBoard rekursionPalautus "E")] ;-------------------------------ASETALISTAAN TOIMII LISTALLA JOSSA NIL
+                        (println "ÄLÄ MEE TÄHÄN NIL ARVOJEN KANSSA")
+                        (println "Syodaan paikat: " rekursionPalautus " Ja asetettiin kivi '" vuoro "' kohtaan '" paikka "'")
+                        (recur (+ i 1) (asetaListaan uusiboard paikka vuoro))
+                        )
+                      )
+                    ;vaihtoehto, rekursiohirviö kutsuttu mutta ei syödä
+                    ;(if (contains? rekursionPalautus nil)
+                    ;älä syö, mutta aseta vuoron omistajan kivi
+                    ;(recur (+ i 1) (asetaListaan palautettavaBoard paikka vuoro))
+                    ;)
+                    )
+                  palautettavaBoard
                   )
                 )
-              ;vaihtoehto, rekursiohirviö kutsuttu mutta ei syödä
-              ;(if (contains? rekursionPalautus nil)
-                ;älä syö, mutta aseta vuoron omistajan kivi
-                ;(recur (+ i 1) (asetaListaan palautettavaBoard paikka vuoro))
-                ;)
-              )
-              palautettavaBoard
+              ) ;loop
             )
-            )
-          ) ;loop
-        ;palautetaan numero yksi, tarkoitetaan että kivi voidaan asettaa ilman lisäseuraamuksia.
-        1
-        );if 3
-      ;palautetaan numero kaksi, Ei loopattu, tahan ei voida asettaa kivea, syontiuhka tai kivi tiella
-      2
-      );if 2
+          ;palautetaan numero yksi, tarkoitetaan että kivi voidaan asettaa ilman lisäseuraamuksia.
+          1
+          ) ;if 3
+        ;palautetaan numero kaksi, Ei loopattu, tahan ei voida asettaa kivea, syontiuhka tai kivi tiella
+        2
+        ) ;if 2
     3
     );if 1
   )
