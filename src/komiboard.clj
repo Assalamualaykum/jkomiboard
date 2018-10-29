@@ -111,14 +111,14 @@
 
 ;ota board ja lisää siihen annetut paikkojen kohdat tietyksi vuoromerkiksi
 (defn asetaListaan [board paikat vuoro]
-  (println "Testejä" paikat " " (instance? clojure.lang.PersistentVector paikat))
+  (println "Testejä1.0" paikat " " (instance? clojure.lang.PersistentVector paikat))
   ;(def paikat [[1 1]])
   ;(def paikat (get paikat 1))
-  (println "Testejä" paikat (get paikat 1)" " (instance? clojure.lang.PersistentVector (get paikat 0)))
+  (println "Testejä1.2" paikat (get paikat 3)" " (instance? clojure.lang.PersistentVector (get paikat 0)))
   (if (instance? clojure.lang.PersistentVector (get paikat 0))
     ;true, aseta vektorissa paikat annettuun kenttään
     (loop [i 0 uusiBoard board]
-      (println "Testejä" paikat " " (get paikat i))
+      (println "Testejä2.0" paikat " " (get paikat i) (get paikat i))
       (when (< i (count paikat))
         (println (type (get paikat i)))
         (if (= (+ i 1) (count paikat))
@@ -172,7 +172,7 @@
 ;Funktio palauttaa kutsuttavaa paikkaa ympäröivät kivet jarjestyksessa vasen, oikea, yla, ala
 (defn ymparoidytKivet [paikka kentta]
   ;palauttaa taman muuttujan, def jotta muuttuja muuttuisi kutsujen välillä
-  (println "PAIKKA" paikka)
+  (println "PAIKKA-kivet" paikka)
   (def kivet [(get-in kentta [(get paikka 0) (- (get paikka 1) 1)])
               (get-in kentta [(get paikka 0) (+ (get paikka 1) 1)])
               (get-in kentta [(- (get paikka 0) 1) (get paikka 1)])
@@ -191,18 +191,16 @@
   )
 
 ;Palauttaa valitun kiven viereiset kivet jotka ovat syötävissä tästä paikasta
-(defn otaSyotavat [alkPerKivi annettuboard]
+;------------------------------------------------------------------------------------------------; Tämä kusee sillä sitä ei ole kirjoitettu ottamaan huomioon vuoroa
+(defn otaSyotavat [alkPerKivi annettuboard vuoro]
   (def annetutSivuKivet (ymparoidytKivet alkPerKivi annettuboard))
   (def annetutSivuPaikat (ymparoidytPaikat alkPerKivi))
   (loop [syontiTarkistettavat [] i 0]
     ;tarkasteltavaKivi sama kuin talla hetkella tarkistettava kivi, onko vihollinen
     (def tarkasteltavaKivi (get annetutSivuKivet i))
-    ;alkuperainen kivi jonka paikkaa testataan,
-    ;sama kuin vuoron omistavan kivi joka olisi asetettu vaikka paikka olisikin tyhja
-    (def asetettavaKivi (get-in annettuboard alkPerKivi))
     (when (< i 4)
       ;tämä ensimmäinen if palauttaa mahdollisen vihollisen kiven sillon kuin se on tarkasteltavan kiven vieressä
-      (def lisattavaKohta (if (not (or (= tarkasteltavaKivi "W") (= tarkasteltavaKivi "E") (= tarkasteltavaKivi asetettavaKivi)))
+      (def lisattavaKohta (if (not (or (= tarkasteltavaKivi "W") (= tarkasteltavaKivi "E") (= tarkasteltavaKivi vuoro)))
                             (get annetutSivuPaikat i)
                             ;(println "else")
                             ))
@@ -262,14 +260,14 @@
               (if (= tamanhetkinenKivi (get-in kentta paikka))
                 (recur (+ i 1) (rekursiohirvio tamanhetkinenPaikka kentta syotavatKivet))
                 ;else jatka seuraavaan loopin kiveen, älä tee mitään
-                (recur (+ i 1) (conj syotavatKivet ""))
+                (recur (+ i 1) syotavatKivet)
                 ); if-4 onkoRyppaassa/oma
               ); if-3 onkotyhja
             ;else jatka seuraavaan loopin kiveen, sillä viimeisin oli jo tarkistettu ------Ei konsistentti palautus.-----
             (if (= i 4)
               ;kun looppi loppuu palautetaan tähän asti muodostettu tarkistettujen noodien lista
               syotavatKivet
-              (recur (+ i 1) (conj syotavatKivet ""))
+              (recur (+ i 1) syotavatKivet)
               )
             ); if-2 onkotarkistettu^
           );when
@@ -284,8 +282,8 @@
 ;Tarkistetaan voiko seuraavaksi asetettava kivi syödä vieresssäolevia kiviä, ja jos pystyy, kutsuu rekursiohirviötä
   ;Mikäli rekursiohirviön seurauksena asetetaan uusi kivi kenttään, kutsu palauttaa uuden kentän johon uusi kivi on sijoitettu
 (defn voikoAsettaaJaSyoda [paikka kentta vuoro]
-  (def vierekkaisetSyotavatPaikat (otaSyotavat paikka kentta))
-  (println vierekkaisetSyotavatPaikat "NAMA PITAISI SYODA")
+  (def vierekkaisetSyotavatPaikat (otaSyotavat paikka kentta vuoro))
+  (println vierekkaisetSyotavatPaikat "nama pitaisi tarkistaa syontia varten")
   ;tarkistetaan onko paikka jo varattu
   (if (not= vuoro paikka) ;-------------------------------------------------mimkä vitttu tää on olevinaan? eri kuin asetettava kivi? intä jos valli tai vastustaja
       ;tarkistetaan aluksi onko paikka sallittu eli siis sitä ei ole ympäröity
@@ -360,7 +358,7 @@
 ;(println (asetaListaan board2 annettu "G"))
 ;(println annetut)
 
-;yksikkötesti
+;yksikkötesti [rivi sarake] [kerros kivi]
 (def rekursionPalautus [[4 5] [4 4]])
 (println "TESTIT 3 " (not (contains? rekursionPalautus nil)) (contains? rekursionPalautus nil))
 
